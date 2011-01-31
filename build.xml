@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="sampleProject" basedir="." default="compile">
+<project name="aho-corasick" basedir="." default="compile">
     <property name="src" value="src"/>
     <property name="output" value="bin"/>
 
