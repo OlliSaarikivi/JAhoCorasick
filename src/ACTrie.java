@@ -7,15 +7,19 @@ public class ACTrie {
 
     private TrieNode root;
     private int numPatterns;
+    private List<byte[]> patterns;
+    private byte[] text;
 
-    public ACTrie(byte[][] patterns, TrieNodeFactory nodeFactory, boolean flatten) {
-        numPatterns = patterns.length;
+    public ACTrie(List<byte[]> patterns, byte[] text, TrieNodeFactory nodeFactory, boolean flatten) {
+        this.text = text;
+        numPatterns = patterns.size();
+        this.patterns = patterns;
 
         root = nodeFactory.createNode();
 
         // Construct trie
-        for (int patternIndex = 0; patternIndex < patterns.length; ++patternIndex) {
-            byte[] pattern = patterns[patternIndex];
+        for (int patternIndex = 0; patternIndex < numPatterns; ++patternIndex) {
+            byte[] pattern = patterns.get(patternIndex);
             TrieNode current = root;
             int symbolIndex = 0;
 
@@ -93,11 +97,8 @@ public class ACTrie {
         }
     }
 
-    public List<List<Integer>> match(byte[] text) {
-        List<List<Integer>> matches = new ArrayList<List<Integer>>();
-        for (int i = 0; i < numPatterns; ++i) {
-            matches.add(new ArrayList<Integer>());
-        }
+    public List<int[]> match() {
+        List<int[]> matches = new ArrayList<int[]>();
 
         TrieNode current = root;
         for (int i = 0; i < text.length; ++i) {
@@ -107,7 +108,7 @@ public class ACTrie {
             }
             current = next;
             for (int patternIndex : current.getPatternIndices()) {
-                matches.get(patternIndex).add(i);
+                matches.add(new int[]{i - patterns.get(patternIndex).length + 1, patternIndex});
             }
         }
 

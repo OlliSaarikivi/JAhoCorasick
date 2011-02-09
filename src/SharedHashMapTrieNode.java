@@ -1,18 +1,40 @@
 import java.util.*;
 
-public class ArrayTrieNode implements TrieNode{
-    private final TrieNode[] children = new TrieNode[1<<Byte.SIZE];
+public class SharedHashMapTrieNode implements TrieNode{
+    public class NodeSymbolPair {
+        public TrieNode node;
+        public byte symbol;
+
+        public int hashCode() {
+            return node.hashCode() + symbol;
+        }
+
+        public boolean equals(Object obj) {
+            if (!(obj instanceof NodeSymbolPair)) return false;
+            NodeSymbolPair other = (NodeSymbolPair) obj;
+            return (node == other.node) && (symbol == other.symbol);
+        }
+    }
+
+    private HashMap<NodeSymbolPair, TrieNode> children;
+    private NodeSymbolPair indexingPair = new NodeSymbolPair();
     private TrieNode fail;
     private Set<Integer> patternIndices = new HashSet<Integer>();
     private byte symbol;
 
+    public SharedHashMapTrieNode(HashMap<NodeSymbolPair, TrieNode> children) {
+        this.children = children;
+        indexingPair.node = this;
+    }
+
     public TrieNode getChild(byte symbol) {
-        return children[(int)symbol-Byte.MIN_VALUE];
+        indexingPair.symbol = symbol;
+        return children.get(indexingPair);
     }
 
     public Iterator<TrieNode> getChildIterator() {
         return new Iterator<TrieNode>() {
-            int i = -1;
+            int symbol = Byte.MIN_VALUE - 1;
             TrieNode next;
             {
                 scanToNext();
@@ -21,8 +43,8 @@ public class ArrayTrieNode implements TrieNode{
             void scanToNext() {
                 next = null;
                 do {
-                    i += 1;
-                } while (i < children.length && (next = children[i]) == null);
+                    symbol += 1;
+                } while (symbol <= Byte.MAX_VALUE && (next = getChild((byte)symbol)) == null);
             }
 
             public boolean hasNext() {
@@ -45,7 +67,10 @@ public class ArrayTrieNode implements TrieNode{
     }
 
     public void setChild(byte symbol, TrieNode child) {
-        children[(int)symbol-Byte.MIN_VALUE] = child;
+        NodeSymbolPair keyPair = new NodeSymbolPair();
+        keyPair.node = this;
+        keyPair.symbol = symbol;
+        children.put(keyPair, child);
     }
 
     public TrieNode getFail() {

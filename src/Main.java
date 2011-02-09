@@ -16,26 +16,26 @@ public class Main {
         byte[] pattern3 = "TAA".getBytes();
         patterns = new byte[][]{pattern3, pattern2,pattern};
         */
-
-        MultiplePatternMatcher mpm = new AhoCorasick(AhoCorasick.TrieImpl.PRIVATE_HASHMAP, false);
+/*
+        MultiplePatternMatcher mpm = new AhoCorasick(AhoCorasick.TrieImpl.SHARED_HASHMAP, false);
 
         long start, end;
 
         for (int i = 0; i < 2; ++i) {
             start = System.currentTimeMillis();
-            mpm.initialize(patterns);
+            mpm.prepare(patterns, text);
             end = System.currentTimeMillis();
             printTime("Trie construction", start, end);
         }
 
-        List<List<Integer>> matches = null;
+        List<int[]> matches = null;
         for (int i = 0; i < 10; ++i) {
             start = System.currentTimeMillis();
-            matches = mpm.match(text);
+            matches = mpm.search();
             end = System.currentTimeMillis();
             printTime("Matching", start, end);
         }
-
+*/
         //printMatches(matches);
     }
 
